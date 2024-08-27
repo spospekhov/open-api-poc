@@ -33,9 +33,9 @@ configure<PublishingExtension> {
                 }
 
                 scm {
-                    connection.set("scm:git:git://github.com/stainless-sdks/apron-api-kotlin.git")
-                    developerConnection.set("scm:git:git://github.com/stainless-sdks/apron-api-kotlin.git")
-                    url.set("https://github.com/stainless-sdks/apron-api-kotlin")
+                    connection.set("scm:git:git://github.com/spospekhov/open-api-poc.git")
+                    developerConnection.set("scm:git:git://github.com/spospekhov/open-api-poc.git")
+                    url.set("https://github.com/spospekhov/open-api-poc")
                 }
 
                 versionMapping {
