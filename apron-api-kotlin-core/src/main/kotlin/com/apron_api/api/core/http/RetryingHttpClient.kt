@@ -1,5 +1,3 @@
-@file:JvmSynthetic
-
 package com.apron_api.api.core.http
 
 import com.apron_api.api.core.RequestOptions
@@ -35,14 +33,22 @@ private constructor(
             return httpClient.execute(request, requestOptions)
         }
 
-        maybeAddIdempotencyHeader(request)
+        var modifiedRequest = maybeAddIdempotencyHeader(request)
+
+        // Don't send the current retry count in the headers if the caller set their own value.
+        val shouldSendRetryCount =
+            !modifiedRequest.headers.names().contains("X-Stainless-Retry-Count")
 
         var retries = 0
 
         while (true) {
+            if (shouldSendRetryCount) {
+                modifiedRequest = setRetryCountHeader(modifiedRequest, retries)
+            }
+
             val response =
                 try {
-                    val response = httpClient.execute(request, requestOptions)
+                    val response = httpClient.execute(modifiedRequest, requestOptions)
                     if (++retries > maxRetries || !shouldRetry(response)) {
                         return response
                     }
@@ -69,14 +75,22 @@ private constructor(
             return httpClient.executeAsync(request, requestOptions)
         }
 
-        maybeAddIdempotencyHeader(request)
+        var modifiedRequest = maybeAddIdempotencyHeader(request)
+
+        // Don't send the current retry count in the headers if the caller set their own value.
+        val shouldSendRetryCount =
+            !modifiedRequest.headers.names().contains("X-Stainless-Retry-Count")
 
         var retries = 0
 
         while (true) {
+            if (shouldSendRetryCount) {
+                modifiedRequest = setRetryCountHeader(modifiedRequest, retries)
+            }
+
             val response =
                 try {
-                    val response = httpClient.execute(request, requestOptions)
+                    val response = httpClient.execute(modifiedRequest, requestOptions)
                     if (++retries > maxRetries || !shouldRetry(response)) {
                         return response
                     }
@@ -95,28 +109,33 @@ private constructor(
         }
     }
 
-    override fun close() {
-        httpClient.close()
-    }
+    override fun close() = httpClient.close()
 
-    private fun isRetryable(request: HttpRequest): Boolean {
+    private fun isRetryable(request: HttpRequest): Boolean =
         // Some requests, such as when a request body is being streamed, cannot be retried because
         // the body data aren't available on subsequent attempts.
-        return request.body?.repeatable() ?: true
-    }
+        request.body?.repeatable() ?: true
+
+    private fun setRetryCountHeader(request: HttpRequest, retries: Int): HttpRequest =
+        request.toBuilder().replaceHeaders("X-Stainless-Retry-Count", retries.toString()).build()
 
     private fun idempotencyKey(): String = "stainless-java-retry-${UUID.randomUUID()}"
 
-    private fun maybeAddIdempotencyHeader(request: HttpRequest) {
-        if (idempotencyHeader != null && !request.headers.containsKey(idempotencyHeader)) {
-            // Set a header to uniquely identify the request when retried
-            request.headers.put(idempotencyHeader, idempotencyKey())
+    private fun maybeAddIdempotencyHeader(request: HttpRequest): HttpRequest {
+        if (idempotencyHeader == null || request.headers.names().contains(idempotencyHeader)) {
+            return request
         }
+
+        return request
+            .toBuilder()
+            // Set a header to uniquely identify the request when retried
+            .putHeader(idempotencyHeader, idempotencyKey())
+            .build()
     }
 
     private fun shouldRetry(response: HttpResponse): Boolean {
         // Note: this is not a standard header
-        val shouldRetryHeader = response.headers().get("x-should-retry").getOrNull(0)
+        val shouldRetryHeader = response.headers().values("X-Should-Retry").getOrNull(0)
         val statusCode = response.statusCode()
 
         return when {
@@ -136,11 +155,10 @@ private constructor(
         }
     }
 
-    private fun shouldRetry(throwable: Throwable): Boolean {
+    private fun shouldRetry(throwable: Throwable): Boolean =
         // Only retry IOException and ApronApiIoException, other exceptions are not intended to be
         // retried.
-        return throwable is IOException || throwable is ApronApiIoException
-    }
+        throwable is IOException || throwable is ApronApiIoException
 
     private fun getRetryBackoffMillis(retries: Int, response: HttpResponse?): Duration {
         // About the Retry-After header:
@@ -149,11 +167,11 @@ private constructor(
             ?.headers()
             ?.let { headers ->
                 headers
-                    .get("Retry-After-Ms")
+                    .values("Retry-After-Ms")
                     .getOrNull(0)
                     ?.toFloatOrNull()
                     ?.times(TimeUnit.MILLISECONDS.toNanos(1))
-                    ?: headers.get("Retry-After").getOrNull(0)?.let { retryAfter ->
+                    ?: headers.values("Retry-After").getOrNull(0)?.let { retryAfter ->
                         retryAfter.toFloatOrNull()?.times(TimeUnit.SECONDS.toNanos(1))
                             ?: try {
                                 ChronoUnit.MILLIS.between(

@@ -3,54 +3,20 @@
 package com.apron_api.api.core
 
 import com.apron_api.api.errors.ApronApiInvalidDataException
-import com.google.common.collect.ImmutableListMultimap
-import com.google.common.collect.ListMultimap
-import com.google.common.collect.Multimaps
 import java.util.Collections
+import java.util.SortedMap
 
-internal fun <T : Any> T?.getOrThrow(name: String): T {
-    if (this == null) {
-        throw ApronApiInvalidDataException("'${name}' is not present")
-    }
+internal fun <T : Any> T?.getOrThrow(name: String): T =
+    this ?: throw ApronApiInvalidDataException("`${name}` is not present")
 
-    return this
-}
+internal fun <T> List<T>.toImmutable(): List<T> =
+    if (isEmpty()) Collections.emptyList() else Collections.unmodifiableList(toList())
 
-internal fun <T> List<T>.toUnmodifiable(): List<T> {
-    if (isEmpty()) {
-        return Collections.emptyList()
-    }
+internal fun <K, V> Map<K, V>.toImmutable(): Map<K, V> =
+    if (isEmpty()) Collections.emptyMap() else Collections.unmodifiableMap(toMap())
 
-    return Collections.unmodifiableList(this)
-}
-
-internal fun <K, V> Map<K, V>.toUnmodifiable(): Map<K, V> {
-    if (isEmpty()) {
-        return Collections.emptyMap()
-    }
-
-    return Collections.unmodifiableMap(this)
-}
-
-internal fun <K, V> ListMultimap<K, V>.toUnmodifiable(): ListMultimap<K, V> {
-    if (isEmpty()) {
-        return ImmutableListMultimap.of()
-    }
-
-    return Multimaps.unmodifiableListMultimap(this)
-}
-
-internal fun ListMultimap<String, String>.getRequiredHeader(header: String): String {
-    val value =
-        entries()
-            .stream()
-            .filter { entry -> entry.key.equals(header, ignoreCase = true) }
-            .map { entry -> entry.value }
-            .findFirst()
-    if (!value.isPresent) {
-        throw ApronApiInvalidDataException("Could not find $header header")
-    }
-    return value.get()
-}
+internal fun <K : Comparable<K>, V> SortedMap<K, V>.toImmutable(): SortedMap<K, V> =
+    if (isEmpty()) Collections.emptySortedMap()
+    else Collections.unmodifiableSortedMap(toSortedMap(comparator()))
 
 internal interface Enum
