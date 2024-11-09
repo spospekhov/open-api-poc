@@ -4,16 +4,16 @@ package com.apron_api.api.services.blocking
 
 import com.apron_api.api.core.ClientOptions
 import com.apron_api.api.core.RequestOptions
+import com.apron_api.api.core.handlers.errorHandler
+import com.apron_api.api.core.handlers.jsonHandler
+import com.apron_api.api.core.handlers.withErrorHandler
 import com.apron_api.api.core.http.HttpMethod
 import com.apron_api.api.core.http.HttpRequest
 import com.apron_api.api.core.http.HttpResponse.Handler
+import com.apron_api.api.core.json
 import com.apron_api.api.errors.ApronApiError
 import com.apron_api.api.models.InstrumentCreateParams
 import com.apron_api.api.models.InstrumentCreateResponse
-import com.apron_api.api.services.errorHandler
-import com.apron_api.api.services.json
-import com.apron_api.api.services.jsonHandler
-import com.apron_api.api.services.withErrorHandler
 
 class InstrumentServiceImpl
 constructor(
@@ -36,9 +36,9 @@ constructor(
                 .method(HttpMethod.POST)
                 .addPathSegments("instruments")
                 .putAllQueryParams(clientOptions.queryParams)
-                .putAllQueryParams(params.getQueryParams())
+                .replaceAllQueryParams(params.getQueryParams())
                 .putAllHeaders(clientOptions.headers)
-                .putAllHeaders(params.getHeaders())
+                .replaceAllHeaders(params.getHeaders())
                 .body(json(clientOptions.jsonMapper, params.getBody()))
                 .build()
         return clientOptions.httpClient.execute(request, requestOptions).let { response ->
