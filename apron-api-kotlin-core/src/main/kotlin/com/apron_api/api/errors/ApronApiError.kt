@@ -4,7 +4,7 @@ package com.apron_api.api.errors
 
 import com.apron_api.api.core.JsonValue
 import com.apron_api.api.core.NoAutoDetect
-import com.apron_api.api.core.toUnmodifiable
+import com.apron_api.api.core.toImmutable
 import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
@@ -13,53 +13,59 @@ import java.util.Objects
 @JsonDeserialize(builder = ApronApiError.Builder::class)
 @NoAutoDetect
 class ApronApiError
-constructor(
-    private val additionalProperties: Map<String, JsonValue>,
+private constructor(
+    @JsonAnyGetter val additionalProperties: Map<String, JsonValue>,
 ) {
-
-    @JsonAnyGetter fun additionalProperties(): Map<String, JsonValue> = additionalProperties
-
-    fun toBuilder() = Builder()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) {
             return true
         }
 
-        return other is ApronApiError && this.additionalProperties == other.additionalProperties
+        return /* spotless:off */ other is ApronApiError && this.additionalProperties == other.additionalProperties /* spotless:on */
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(additionalProperties)
+        return /* spotless:off */ Objects.hash(additionalProperties) /* spotless:on */
     }
 
     override fun toString() = "ApronApiError{additionalProperties=$additionalProperties}"
 
+    fun toBuilder() = Builder().from(this)
+
     companion object {
 
-        @JvmStatic fun builder() = Builder()
+        fun builder() = Builder()
     }
 
     class Builder {
 
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
-        fun from(error: ApronApiError) = apply { additionalProperties(error.additionalProperties) }
+        internal fun from(apronApiError: ApronApiError) = apply {
+            additionalProperties = apronApiError.additionalProperties.toMutableMap()
+        }
 
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.clear()
-            this.additionalProperties.putAll(additionalProperties)
+            putAllAdditionalProperties(additionalProperties)
         }
 
         @JsonAnySetter
         fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-            this.additionalProperties.put(key, value)
+            additionalProperties.put(key, value)
         }
 
         fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.putAll(additionalProperties)
         }
 
-        fun build(): ApronApiError = ApronApiError(additionalProperties.toUnmodifiable())
+        fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
+
+        fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+            keys.forEach(::removeAdditionalProperty)
+        }
+
+        fun build(): ApronApiError = ApronApiError(additionalProperties.toImmutable())
     }
 }

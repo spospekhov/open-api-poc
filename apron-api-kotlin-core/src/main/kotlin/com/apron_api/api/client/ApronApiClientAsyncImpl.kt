@@ -3,23 +3,28 @@
 package com.apron_api.api.client
 
 import com.apron_api.api.core.ClientOptions
-import com.apron_api.api.core.http.HttpResponse.Handler
-import com.apron_api.api.errors.ApronApiError
+import com.apron_api.api.core.getPackageVersion
 import com.apron_api.api.models.*
 import com.apron_api.api.services.async.*
-import com.apron_api.api.services.errorHandler
 
 class ApronApiClientAsyncImpl
 constructor(
     private val clientOptions: ClientOptions,
 ) : ApronApiClientAsync {
 
-    private val errorHandler: Handler<ApronApiError> = errorHandler(clientOptions.jsonMapper)
+    private val clientOptionsWithUserAgent =
+        if (clientOptions.headers.names().contains("User-Agent")) clientOptions
+        else
+            clientOptions
+                .toBuilder()
+                .putHeader("User-Agent", "${javaClass.simpleName}/Kotlin ${getPackageVersion()}")
+                .build()
 
+    // Pass the original clientOptions so that this client sets its own User-Agent.
     private val sync: ApronApiClient by lazy { ApronApiClientImpl(clientOptions) }
 
     private val instruments: InstrumentServiceAsync by lazy {
-        InstrumentServiceAsyncImpl(clientOptions)
+        InstrumentServiceAsyncImpl(clientOptionsWithUserAgent)
     }
 
     override fun sync(): ApronApiClient = sync

@@ -7,7 +7,7 @@ import com.apron_api.api.core.JsonField
 import com.apron_api.api.core.JsonMissing
 import com.apron_api.api.core.JsonValue
 import com.apron_api.api.core.NoAutoDetect
-import com.apron_api.api.core.toUnmodifiable
+import com.apron_api.api.core.toImmutable
 import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonProperty
@@ -26,8 +26,6 @@ private constructor(
 ) {
 
     private var validated: Boolean = false
-
-    private var hashCode: Int = 0
 
     fun id(): String = id.getRequired("id")
 
@@ -60,36 +58,6 @@ private constructor(
     }
 
     fun toBuilder() = Builder().from(this)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-
-        return other is InstrumentCreateResponse &&
-            this.id == other.id &&
-            this.ownerId == other.ownerId &&
-            this.lastFour == other.lastFour &&
-            this.expirationDate == other.expirationDate &&
-            this.additionalProperties == other.additionalProperties
-    }
-
-    override fun hashCode(): Int {
-        if (hashCode == 0) {
-            hashCode =
-                Objects.hash(
-                    id,
-                    ownerId,
-                    lastFour,
-                    expirationDate,
-                    additionalProperties,
-                )
-        }
-        return hashCode
-    }
-
-    override fun toString() =
-        "InstrumentCreateResponse{id=$id, ownerId=$ownerId, lastFour=$lastFour, expirationDate=$expirationDate, additionalProperties=$additionalProperties}"
 
     companion object {
 
@@ -156,7 +124,27 @@ private constructor(
                 ownerId,
                 lastFour,
                 expirationDate,
-                additionalProperties.toUnmodifiable(),
+                additionalProperties.toImmutable(),
             )
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+
+        return /* spotless:off */ other is InstrumentCreateResponse && this.id == other.id && this.ownerId == other.ownerId && this.lastFour == other.lastFour && this.expirationDate == other.expirationDate && this.additionalProperties == other.additionalProperties /* spotless:on */
+    }
+
+    private var hashCode: Int = 0
+
+    override fun hashCode(): Int {
+        if (hashCode == 0) {
+            hashCode = /* spotless:off */ Objects.hash(id, ownerId, lastFour, expirationDate, additionalProperties) /* spotless:on */
+        }
+        return hashCode
+    }
+
+    override fun toString() =
+        "InstrumentCreateResponse{id=$id, ownerId=$ownerId, lastFour=$lastFour, expirationDate=$expirationDate, additionalProperties=$additionalProperties}"
 }

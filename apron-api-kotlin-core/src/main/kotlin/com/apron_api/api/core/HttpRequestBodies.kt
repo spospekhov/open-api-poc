@@ -1,10 +1,7 @@
 @file:JvmName("HttpRequestBodies")
 
-package com.apron_api.api.services
+package com.apron_api.api.core
 
-import com.apron_api.api.core.Enum
-import com.apron_api.api.core.JsonValue
-import com.apron_api.api.core.MultipartFormValue
 import com.apron_api.api.core.http.HttpRequestBody
 import com.apron_api.api.errors.ApronApiException
 import com.fasterxml.jackson.databind.json.JsonMapper

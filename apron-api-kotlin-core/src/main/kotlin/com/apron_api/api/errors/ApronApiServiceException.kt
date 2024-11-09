@@ -1,14 +1,21 @@
 package com.apron_api.api.errors
 
-import com.google.common.collect.ListMultimap
+import com.apron_api.api.core.http.Headers
 
-abstract class ApronApiServiceException
-constructor(
-    private val headers: ListMultimap<String, String>,
-    message: String? = null,
+abstract class ApronApiServiceException(
+    private val statusCode: Int,
+    private val headers: Headers,
+    private val body: String,
+    private val error: ApronApiError,
+    message: String = "$statusCode: $error",
     cause: Throwable? = null
 ) : ApronApiException(message, cause) {
-    abstract fun statusCode(): Int
 
-    fun headers(): ListMultimap<String, String> = headers
+    fun statusCode(): Int = statusCode
+
+    fun headers(): Headers = headers
+
+    fun body(): String = body
+
+    fun error(): ApronApiError = error
 }

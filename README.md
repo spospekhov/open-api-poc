@@ -58,7 +58,7 @@ import com.apron_api.api.models.InstrumentCreateParams
 import com.apron_api.api.models.InstrumentCreateResponse
 
 val params = InstrumentCreateParams.builder().build()
-val instrumentCreateResponse = client.instruments().create(params)
+val instrument = client.instruments().create(params)
 ```
 
 ---
@@ -90,7 +90,7 @@ val params = InstrumentCreateParams.builder()
 When receiving a response, the Apron API Kotlin SDK will deserialize it into instances of the typed model classes. In rare cases, the API may return a response property that doesn't match the expected Kotlin type. If you directly access the mistaken property, the SDK will throw an unchecked `ApronApiInvalidDataException` at runtime. If you would prefer to check in advance that that response is completely well-typed, call `.validate()` on the returned model.
 
 ```kotlin
-val instrumentCreateResponse = client.instruments().create().validate()
+val instrument = client.instruments().create().validate()
 ```
 
 ### Response properties as JSON

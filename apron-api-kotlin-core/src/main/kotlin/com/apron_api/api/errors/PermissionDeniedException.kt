@@ -1,13 +1,9 @@
 package com.apron_api.api.errors
 
-import com.google.common.collect.ListMultimap
+import com.apron_api.api.core.http.Headers
 
-class PermissionDeniedException
-constructor(
-    headers: ListMultimap<String, String>,
-    private val error: ApronApiError,
-) : ApronApiServiceException(headers, "${error}") {
-    override fun statusCode(): Int = 403
-
-    fun error(): ApronApiError = error
-}
+class PermissionDeniedException(
+    headers: Headers,
+    body: String,
+    error: ApronApiError,
+) : ApronApiServiceException(403, headers, body, error)
