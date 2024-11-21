@@ -133,17 +133,14 @@ private constructor(
             return true
         }
 
-        return /* spotless:off */ other is InstrumentCreateResponse && this.id == other.id && this.ownerId == other.ownerId && this.lastFour == other.lastFour && this.expirationDate == other.expirationDate && this.additionalProperties == other.additionalProperties /* spotless:on */
+        return /* spotless:off */ other is InstrumentCreateResponse && id == other.id && ownerId == other.ownerId && lastFour == other.lastFour && expirationDate == other.expirationDate && additionalProperties == other.additionalProperties /* spotless:on */
     }
 
-    private var hashCode: Int = 0
+    /* spotless:off */
+    private val hashCode: Int by lazy { Objects.hash(id, ownerId, lastFour, expirationDate, additionalProperties) }
+    /* spotless:on */
 
-    override fun hashCode(): Int {
-        if (hashCode == 0) {
-            hashCode = /* spotless:off */ Objects.hash(id, ownerId, lastFour, expirationDate, additionalProperties) /* spotless:on */
-        }
-        return hashCode
-    }
+    override fun hashCode(): Int = hashCode
 
     override fun toString() =
         "InstrumentCreateResponse{id=$id, ownerId=$ownerId, lastFour=$lastFour, expirationDate=$expirationDate, additionalProperties=$additionalProperties}"
