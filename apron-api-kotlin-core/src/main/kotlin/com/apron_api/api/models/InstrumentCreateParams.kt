@@ -149,17 +149,14 @@ constructor(
                 return true
             }
 
-            return /* spotless:off */ other is InstrumentCreateBody && this.token == other.token && this.accountId == other.accountId && this.companyId == other.companyId && this.name == other.name && this.type == other.type && this.additionalProperties == other.additionalProperties /* spotless:on */
+            return /* spotless:off */ other is InstrumentCreateBody && token == other.token && accountId == other.accountId && companyId == other.companyId && name == other.name && type == other.type && additionalProperties == other.additionalProperties /* spotless:on */
         }
 
-        private var hashCode: Int = 0
+        /* spotless:off */
+        private val hashCode: Int by lazy { Objects.hash(token, accountId, companyId, name, type, additionalProperties) }
+        /* spotless:on */
 
-        override fun hashCode(): Int {
-            if (hashCode == 0) {
-                hashCode = /* spotless:off */ Objects.hash(token, accountId, companyId, name, type, additionalProperties) /* spotless:on */
-            }
-            return hashCode
-        }
+        override fun hashCode(): Int = hashCode
 
         override fun toString() =
             "InstrumentCreateBody{token=$token, accountId=$accountId, companyId=$companyId, name=$name, type=$type, additionalProperties=$additionalProperties}"
@@ -176,12 +173,10 @@ constructor(
             return true
         }
 
-        return /* spotless:off */ other is InstrumentCreateParams && this.token == other.token && this.accountId == other.accountId && this.companyId == other.companyId && this.name == other.name && this.type == other.type && this.additionalHeaders == other.additionalHeaders && this.additionalQueryParams == other.additionalQueryParams && this.additionalBodyProperties == other.additionalBodyProperties /* spotless:on */
+        return /* spotless:off */ other is InstrumentCreateParams && token == other.token && accountId == other.accountId && companyId == other.companyId && name == other.name && type == other.type && additionalHeaders == other.additionalHeaders && additionalQueryParams == other.additionalQueryParams && additionalBodyProperties == other.additionalBodyProperties /* spotless:on */
     }
 
-    override fun hashCode(): Int {
-        return /* spotless:off */ Objects.hash(token, accountId, companyId, name, type, additionalHeaders, additionalQueryParams, additionalBodyProperties) /* spotless:on */
-    }
+    override fun hashCode(): Int = /* spotless:off */ Objects.hash(token, accountId, companyId, name, type, additionalHeaders, additionalQueryParams, additionalBodyProperties) /* spotless:on */
 
     override fun toString() =
         "InstrumentCreateParams{token=$token, accountId=$accountId, companyId=$companyId, name=$name, type=$type, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams, additionalBodyProperties=$additionalBodyProperties}"
@@ -372,7 +367,7 @@ constructor(
                 return true
             }
 
-            return /* spotless:off */ other is Type && this.value == other.value /* spotless:on */
+            return /* spotless:off */ other is Type && value == other.value /* spotless:on */
         }
 
         override fun hashCode() = value.hashCode()
