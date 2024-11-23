@@ -41,6 +41,12 @@ constructor(
 
     fun type(): Type? = type
 
+    fun _additionalHeaders(): Headers = additionalHeaders
+
+    fun _additionalQueryParams(): QueryParams = additionalQueryParams
+
+    fun _additionalBodyProperties(): Map<String, JsonValue> = additionalBodyProperties
+
     internal fun getBody(): InstrumentCreateBody {
         return InstrumentCreateBody(
             token,
@@ -162,25 +168,6 @@ constructor(
             "InstrumentCreateBody{token=$token, accountId=$accountId, companyId=$companyId, name=$name, type=$type, additionalProperties=$additionalProperties}"
     }
 
-    fun _additionalHeaders(): Headers = additionalHeaders
-
-    fun _additionalQueryParams(): QueryParams = additionalQueryParams
-
-    fun _additionalBodyProperties(): Map<String, JsonValue> = additionalBodyProperties
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) {
-            return true
-        }
-
-        return /* spotless:off */ other is InstrumentCreateParams && token == other.token && accountId == other.accountId && companyId == other.companyId && name == other.name && type == other.type && additionalHeaders == other.additionalHeaders && additionalQueryParams == other.additionalQueryParams && additionalBodyProperties == other.additionalBodyProperties /* spotless:on */
-    }
-
-    override fun hashCode(): Int = /* spotless:off */ Objects.hash(token, accountId, companyId, name, type, additionalHeaders, additionalQueryParams, additionalBodyProperties) /* spotless:on */
-
-    override fun toString() =
-        "InstrumentCreateParams{token=$token, accountId=$accountId, companyId=$companyId, name=$name, type=$type, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams, additionalBodyProperties=$additionalBodyProperties}"
-
     fun toBuilder() = Builder().from(this)
 
     companion object {
@@ -201,14 +188,15 @@ constructor(
         private var additionalBodyProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
         internal fun from(instrumentCreateParams: InstrumentCreateParams) = apply {
-            this.token = instrumentCreateParams.token
-            this.accountId = instrumentCreateParams.accountId
-            this.companyId = instrumentCreateParams.companyId
-            this.name = instrumentCreateParams.name
-            this.type = instrumentCreateParams.type
-            additionalHeaders(instrumentCreateParams.additionalHeaders)
-            additionalQueryParams(instrumentCreateParams.additionalQueryParams)
-            additionalBodyProperties(instrumentCreateParams.additionalBodyProperties)
+            token = instrumentCreateParams.token
+            accountId = instrumentCreateParams.accountId
+            companyId = instrumentCreateParams.companyId
+            name = instrumentCreateParams.name
+            type = instrumentCreateParams.type
+            additionalHeaders = instrumentCreateParams.additionalHeaders.toBuilder()
+            additionalQueryParams = instrumentCreateParams.additionalQueryParams.toBuilder()
+            additionalBodyProperties =
+                instrumentCreateParams.additionalBodyProperties.toMutableMap()
         }
 
         fun token(token: String) = apply { this.token = token }
@@ -410,4 +398,17 @@ constructor(
 
         fun asString(): String = _value().asStringOrThrow()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+
+        return /* spotless:off */ other is InstrumentCreateParams && token == other.token && accountId == other.accountId && companyId == other.companyId && name == other.name && type == other.type && additionalHeaders == other.additionalHeaders && additionalQueryParams == other.additionalQueryParams && additionalBodyProperties == other.additionalBodyProperties /* spotless:on */
+    }
+
+    override fun hashCode(): Int = /* spotless:off */ Objects.hash(token, accountId, companyId, name, type, additionalHeaders, additionalQueryParams, additionalBodyProperties) /* spotless:on */
+
+    override fun toString() =
+        "InstrumentCreateParams{token=$token, accountId=$accountId, companyId=$companyId, name=$name, type=$type, additionalHeaders=$additionalHeaders, additionalQueryParams=$additionalQueryParams, additionalBodyProperties=$additionalBodyProperties}"
 }
