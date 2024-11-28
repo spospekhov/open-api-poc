@@ -21,7 +21,7 @@ The REST API documentation can be found on [docs.apron-api.com](https://docs.ap
 <!-- x-release-please-start-version -->
 
 ```kotlin
-implementation("com.apron_api.api:apron-api-kotlin:0.0.1-alpha.0")
+implementation("com.apron_api.api:apron-api-kotlin:0.0.1-alpha.1")
 ```
 
 #### Maven
@@ -30,7 +30,7 @@ implementation("com.apron_api.api:apron-api-kotlin:0.0.1-alpha.0")
 <dependency>
     <groupId>com.apron_api.api</groupId>
     <artifactId>apron-api-kotlin</artifactId>
-    <version>0.0.1-alpha.0</version>
+    <version>0.0.1-alpha.1</version>
 </dependency>
 ```
 
