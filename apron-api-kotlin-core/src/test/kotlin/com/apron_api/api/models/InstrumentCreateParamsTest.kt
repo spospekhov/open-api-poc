@@ -2,7 +2,6 @@
 
 package com.apron_api.api.models
 
-import com.apron_api.api.models.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

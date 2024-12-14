@@ -11,7 +11,6 @@ import com.apron_api.api.core.http.Headers
 import com.apron_api.api.core.http.QueryParams
 import com.apron_api.api.core.toImmutable
 import com.apron_api.api.errors.ApronApiInvalidDataException
-import com.apron_api.api.models.*
 import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonCreator

@@ -4,8 +4,8 @@ package com.apron_api.api.client
 
 import com.apron_api.api.core.ClientOptions
 import com.apron_api.api.core.getPackageVersion
-import com.apron_api.api.models.*
-import com.apron_api.api.services.blocking.*
+import com.apron_api.api.services.blocking.InstrumentService
+import com.apron_api.api.services.blocking.InstrumentServiceImpl
 
 class ApronApiClientImpl
 constructor(
