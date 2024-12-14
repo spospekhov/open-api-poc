@@ -4,7 +4,7 @@ package com.apron_api.api.services.blocking
 
 import com.apron_api.api.TestServerExtension
 import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
-import com.apron_api.api.models.*
+import com.apron_api.api.models.InstrumentCreateParams
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
