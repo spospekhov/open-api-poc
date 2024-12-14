@@ -4,19 +4,17 @@ package com.apron_api.api.services
 
 import com.apron_api.api.client.ApronApiClient
 import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
-import com.apron_api.api.core.JsonString
 import com.apron_api.api.core.JsonValue
 import com.apron_api.api.core.jsonMapper
-import com.apron_api.api.models.*
+import com.apron_api.api.models.InstrumentCreateParams
+import com.apron_api.api.models.InstrumentCreateResponse
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
-import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.github.tomakehurst.wiremock.client.WireMock.post
 import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
-import com.github.tomakehurst.wiremock.client.WireMock.put
 import com.github.tomakehurst.wiremock.client.WireMock.stubFor
 import com.github.tomakehurst.wiremock.client.WireMock.verify
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
@@ -48,7 +46,7 @@ class ServiceParamsTest {
 
         val additionalBodyProperties = mutableMapOf<String, JsonValue>()
 
-        additionalBodyProperties.put("testBodyProperty", JsonString.of("ghi890"))
+        additionalBodyProperties.put("testBodyProperty", JsonValue.from("ghi890"))
 
         val params =
             InstrumentCreateParams.builder()

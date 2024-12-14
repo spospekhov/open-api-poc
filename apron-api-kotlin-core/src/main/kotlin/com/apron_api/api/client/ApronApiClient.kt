@@ -2,8 +2,7 @@
 
 package com.apron_api.api.client
 
-import com.apron_api.api.models.*
-import com.apron_api.api.services.blocking.*
+import com.apron_api.api.services.blocking.InstrumentService
 
 interface ApronApiClient {
 

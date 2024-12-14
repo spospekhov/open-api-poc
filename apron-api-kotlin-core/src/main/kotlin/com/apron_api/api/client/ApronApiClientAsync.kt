@@ -2,8 +2,7 @@
 
 package com.apron_api.api.client
 
-import com.apron_api.api.models.*
-import com.apron_api.api.services.async.*
+import com.apron_api.api.services.async.InstrumentServiceAsync
 
 interface ApronApiClientAsync {
 
