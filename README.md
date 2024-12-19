@@ -41,6 +41,9 @@ implementation("com.apron_api.api:apron-api-kotlin:0.0.1-alpha.0")
 Use `ApronApiOkHttpClient.builder()` to configure the client.
 
 ```kotlin
+import com.apron_api.api.client.ApronApiClient
+import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
+
 val client = ApronApiOkHttpClient.fromEnv()
 ```
 
@@ -50,8 +53,7 @@ Read the documentation for more configuration options.
 
 ### Example: creating a resource
 
-To create a new instrument, first use the `InstrumentCreateParams` builder to specify attributes,
-then pass that to the `create` method of the `instruments` service.
+To create a new instrument, first use the `InstrumentCreateParams` builder to specify attributes, then pass that to the `create` method of the `instruments` service.
 
 ```kotlin
 import com.apron_api.api.models.InstrumentCreateParams
@@ -69,14 +71,14 @@ val instrument = client.instruments().create(params)
 
 To make a request to the Apron API API, you generally build an instance of the appropriate `Params` class.
 
-In [Example: creating a resource](#example-creating-a-resource) above, we used the `InstrumentCreateParams.builder()` to pass to
-the `create` method of the `instruments` service.
+In [Example: creating a resource](#example-creating-a-resource) above, we used the `InstrumentCreateParams.builder()` to pass to the `create` method of the `instruments` service.
 
-Sometimes, the API may support other properties that are not yet supported in the Kotlin SDK types. In that case,
-you can attach them using the `putAdditionalProperty` method.
+Sometimes, the API may support other properties that are not yet supported in the Kotlin SDK types. In that case, you can attach them using the `putAdditionalProperty` method.
 
 ```kotlin
-import com.apron_api.api.models.core.JsonValue
+import com.apron_api.api.core.JsonValue
+import com.apron_api.api.models.InstrumentCreateParams
+
 val params = InstrumentCreateParams.builder()
     // ... normal properties
     .putAdditionalProperty("secret_param", JsonValue.from("4242"))
@@ -90,15 +92,19 @@ val params = InstrumentCreateParams.builder()
 When receiving a response, the Apron API Kotlin SDK will deserialize it into instances of the typed model classes. In rare cases, the API may return a response property that doesn't match the expected Kotlin type. If you directly access the mistaken property, the SDK will throw an unchecked `ApronApiInvalidDataException` at runtime. If you would prefer to check in advance that that response is completely well-typed, call `.validate()` on the returned model.
 
 ```kotlin
+import com.apron_api.api.models.InstrumentCreateResponse
+
 val instrument = client.instruments().create().validate()
 ```
 
 ### Response properties as JSON
 
-In rare cases, you may want to access the underlying JSON value for a response property rather than using the typed version provided by
-this SDK. Each model property has a corresponding JSON version, with an underscore before the method name, which returns a `JsonField` value.
+In rare cases, you may want to access the underlying JSON value for a response property rather than using the typed version provided by this SDK. Each model property has a corresponding JSON version, with an underscore before the method name, which returns a `JsonField` value.
 
 ```kotlin
+import com.apron_api.api.core.JsonField
+import java.util.Optional
+
 val field = responseObj._field
 
 if (field.isMissing()) {
@@ -120,6 +126,8 @@ if (field.isMissing()) {
 Sometimes, the server response may include additional properties that are not yet available in this library's types. You can access them using the model's `_additionalProperties` method:
 
 ```kotlin
+import com.apron_api.api.core.JsonValue
+
 val secret = instrumentCreateResponse._additionalProperties().get("secret_field")
 ```
 
@@ -133,31 +141,33 @@ This library throws exceptions in a single hierarchy for easy handling:
 
 - **`ApronApiException`** - Base exception for all exceptions
 
-  - **`ApronApiServiceException`** - HTTP errors with a well-formed response body we were able to parse. The exception message and the `.debuggingRequestId()` will be set by the server.
+- **`ApronApiServiceException`** - HTTP errors with a well-formed response body we were able to parse. The exception message and the `.debuggingRequestId()` will be set by the server.
 
-    | 400    | BadRequestException           |
-    | ------ | ----------------------------- |
-    | 401    | AuthenticationException       |
-    | 403    | PermissionDeniedException     |
-    | 404    | NotFoundException             |
-    | 422    | UnprocessableEntityException  |
-    | 429    | RateLimitException            |
-    | 5xx    | InternalServerException       |
-    | others | UnexpectedStatusCodeException |
+  | 400    | BadRequestException           |
+  | ------ | ----------------------------- |
+  | 401    | AuthenticationException       |
+  | 403    | PermissionDeniedException     |
+  | 404    | NotFoundException             |
+  | 422    | UnprocessableEntityException  |
+  | 429    | RateLimitException            |
+  | 5xx    | InternalServerException       |
+  | others | UnexpectedStatusCodeException |
 
-  - **`ApronApiIoException`** - I/O networking errors
-  - **`ApronApiInvalidDataException`** - any other exceptions on the client side, e.g.:
-    - We failed to serialize the request body
-    - We failed to parse the response body (has access to response code and body)
+- **`ApronApiIoException`** - I/O networking errors
+- **`ApronApiInvalidDataException`** - any other exceptions on the client side, e.g.:
+  - We failed to serialize the request body
+  - We failed to parse the response body (has access to response code and body)
 
 ## Network options
 
 ### Retries
 
-Requests that experience certain errors are automatically retried 2 times by default, with a short exponential backoff. Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict, 429 Rate Limit, and >=500 Internal errors will all be retried by default.
-You can provide a `maxRetries` on the client builder to configure this:
+Requests that experience certain errors are automatically retried 2 times by default, with a short exponential backoff. Connection errors (for example, due to a network connectivity problem), 408 Request Timeout, 409 Conflict, 429 Rate Limit, and >=500 Internal errors will all be retried by default. You can provide a `maxRetries` on the client builder to configure this:
 
 ```kotlin
+import com.apron_api.api.client.ApronApiClient
+import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
+
 val client = ApronApiOkHttpClient.builder()
     .fromEnv()
     .maxRetries(4)
@@ -169,6 +179,10 @@ val client = ApronApiOkHttpClient.builder()
 Requests time out after 1 minute by default. You can configure this on the client builder:
 
 ```kotlin
+import com.apron_api.api.client.ApronApiClient
+import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
+import java.time.Duration
+
 val client = ApronApiOkHttpClient.builder()
     .fromEnv()
     .timeout(Duration.ofSeconds(30))
@@ -180,12 +194,14 @@ val client = ApronApiOkHttpClient.builder()
 Requests can be routed through a proxy. You can configure this on the client builder:
 
 ```kotlin
+import com.apron_api.api.client.ApronApiClient
+import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
+import java.net.InetSocketAddress
+import java.net.Proxy
+
 val client = ApronApiOkHttpClient.builder()
     .fromEnv()
-    .proxy(new Proxy(
-        Type.HTTP,
-        new InetSocketAddress("proxy.com", 8080)
-    ))
+    .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress("example.com", 8080)))
     .build()
 ```
 
