@@ -44,7 +44,7 @@ Use `ApronApiOkHttpClient.builder()` to configure the client.
 import com.apron_api.api.client.ApronApiClient
 import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
 
-val client = ApronApiOkHttpClient.fromEnv()
+val client: ApronApiClient = ApronApiOkHttpClient.fromEnv()
 ```
 
 Read the documentation for more configuration options.
@@ -59,8 +59,8 @@ To create a new instrument, first use the `InstrumentCreateParams` builder to sp
 import com.apron_api.api.models.InstrumentCreateParams
 import com.apron_api.api.models.InstrumentCreateResponse
 
-val params = InstrumentCreateParams.builder().build()
-val instrument = client.instruments().create(params)
+val params: InstrumentCreateParams = InstrumentCreateParams.builder().build()
+val instrument: InstrumentCreateResponse = client.instruments().create(params)
 ```
 
 ---
@@ -79,7 +79,7 @@ Sometimes, the API may support other properties that are not yet supported in th
 import com.apron_api.api.core.JsonValue
 import com.apron_api.api.models.InstrumentCreateParams
 
-val params = InstrumentCreateParams.builder()
+val params: InstrumentCreateParams = InstrumentCreateParams.builder()
     // ... normal properties
     .putAdditionalProperty("secret_param", JsonValue.from("4242"))
     .build()
@@ -94,7 +94,7 @@ When receiving a response, the Apron API Kotlin SDK will deserialize it into ins
 ```kotlin
 import com.apron_api.api.models.InstrumentCreateResponse
 
-val instrument = client.instruments().create().validate()
+val instrument: InstrumentCreateResponse = client.instruments().create().validate()
 ```
 
 ### Response properties as JSON
@@ -105,7 +105,7 @@ In rare cases, you may want to access the underlying JSON value for a response p
 import com.apron_api.api.core.JsonField
 import java.util.Optional
 
-val field = responseObj._field
+val field: JsonField = responseObj._field
 
 if (field.isMissing()) {
   // Value was not specified in the JSON response
@@ -117,7 +117,7 @@ if (field.isMissing()) {
 
   // If the value given by the API did not match the shape that the SDK expects
   // you can deserialise into a custom type
-  val myObj = responseObj._field.asUnknown()?.convert(MyClass.class)
+  val myObj: MyClass = responseObj._field.asUnknown()?.convert(MyClass.class)
 }
 ```
 
@@ -128,7 +128,7 @@ Sometimes, the server response may include additional properties that are not ye
 ```kotlin
 import com.apron_api.api.core.JsonValue
 
-val secret = instrumentCreateResponse._additionalProperties().get("secret_field")
+val secret: JsonValue = instrumentCreateResponse._additionalProperties().get("secret_field")
 ```
 
 ---
@@ -168,7 +168,7 @@ Requests that experience certain errors are automatically retried 2 times by def
 import com.apron_api.api.client.ApronApiClient
 import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
 
-val client = ApronApiOkHttpClient.builder()
+val client: ApronApiClient = ApronApiOkHttpClient.builder()
     .fromEnv()
     .maxRetries(4)
     .build()
@@ -183,7 +183,7 @@ import com.apron_api.api.client.ApronApiClient
 import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
 import java.time.Duration
 
-val client = ApronApiOkHttpClient.builder()
+val client: ApronApiClient = ApronApiOkHttpClient.builder()
     .fromEnv()
     .timeout(Duration.ofSeconds(30))
     .build()
@@ -199,7 +199,7 @@ import com.apron_api.api.client.okhttp.ApronApiOkHttpClient
 import java.net.InetSocketAddress
 import java.net.Proxy
 
-val client = ApronApiOkHttpClient.builder()
+val client: ApronApiClient = ApronApiOkHttpClient.builder()
     .fromEnv()
     .proxy(Proxy(Proxy.Type.HTTP, InetSocketAddress("example.com", 8080)))
     .build()
