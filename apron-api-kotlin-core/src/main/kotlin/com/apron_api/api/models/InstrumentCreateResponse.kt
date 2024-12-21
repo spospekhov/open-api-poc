@@ -7,25 +7,30 @@ import com.apron_api.api.core.JsonField
 import com.apron_api.api.core.JsonMissing
 import com.apron_api.api.core.JsonValue
 import com.apron_api.api.core.NoAutoDetect
+import com.apron_api.api.core.immutableEmptyMap
 import com.apron_api.api.core.toImmutable
 import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
+import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.util.Objects
 
-@JsonDeserialize(builder = InstrumentCreateResponse.Builder::class)
 @NoAutoDetect
 class InstrumentCreateResponse
+@JsonCreator
 private constructor(
-    private val id: JsonField<String>,
-    private val ownerId: JsonField<String>,
-    private val lastFour: JsonField<String>,
-    private val expirationDate: JsonField<String>,
-    private val additionalProperties: Map<String, JsonValue>,
+    @JsonProperty("id") @ExcludeMissing private val id: JsonField<String> = JsonMissing.of(),
+    @JsonProperty("ownerId")
+    @ExcludeMissing
+    private val ownerId: JsonField<String> = JsonMissing.of(),
+    @JsonProperty("lastFour")
+    @ExcludeMissing
+    private val lastFour: JsonField<String> = JsonMissing.of(),
+    @JsonProperty("expirationDate")
+    @ExcludeMissing
+    private val expirationDate: JsonField<String> = JsonMissing.of(),
+    @JsonAnySetter private val additionalProperties: Map<String, JsonValue> = immutableEmptyMap(),
 ) {
-
-    private var validated: Boolean = false
 
     fun id(): String = id.getRequired("id")
 
@@ -46,6 +51,8 @@ private constructor(
     @JsonAnyGetter
     @ExcludeMissing
     fun _additionalProperties(): Map<String, JsonValue> = additionalProperties
+
+    private var validated: Boolean = false
 
     fun validate(): InstrumentCreateResponse = apply {
         if (!validated) {
@@ -73,49 +80,48 @@ private constructor(
         private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
         internal fun from(instrumentCreateResponse: InstrumentCreateResponse) = apply {
-            this.id = instrumentCreateResponse.id
-            this.ownerId = instrumentCreateResponse.ownerId
-            this.lastFour = instrumentCreateResponse.lastFour
-            this.expirationDate = instrumentCreateResponse.expirationDate
-            additionalProperties(instrumentCreateResponse.additionalProperties)
+            id = instrumentCreateResponse.id
+            ownerId = instrumentCreateResponse.ownerId
+            lastFour = instrumentCreateResponse.lastFour
+            expirationDate = instrumentCreateResponse.expirationDate
+            additionalProperties = instrumentCreateResponse.additionalProperties.toMutableMap()
         }
 
         fun id(id: String) = id(JsonField.of(id))
 
-        @JsonProperty("id") @ExcludeMissing fun id(id: JsonField<String>) = apply { this.id = id }
+        fun id(id: JsonField<String>) = apply { this.id = id }
 
         fun ownerId(ownerId: String) = ownerId(JsonField.of(ownerId))
 
-        @JsonProperty("ownerId")
-        @ExcludeMissing
         fun ownerId(ownerId: JsonField<String>) = apply { this.ownerId = ownerId }
 
         fun lastFour(lastFour: String) = lastFour(JsonField.of(lastFour))
 
-        @JsonProperty("lastFour")
-        @ExcludeMissing
         fun lastFour(lastFour: JsonField<String>) = apply { this.lastFour = lastFour }
 
         fun expirationDate(expirationDate: String) = expirationDate(JsonField.of(expirationDate))
 
-        @JsonProperty("expirationDate")
-        @ExcludeMissing
         fun expirationDate(expirationDate: JsonField<String>) = apply {
             this.expirationDate = expirationDate
         }
 
         fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.clear()
-            this.additionalProperties.putAll(additionalProperties)
+            putAllAdditionalProperties(additionalProperties)
         }
 
-        @JsonAnySetter
         fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-            this.additionalProperties.put(key, value)
+            additionalProperties.put(key, value)
         }
 
         fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
             this.additionalProperties.putAll(additionalProperties)
+        }
+
+        fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
+
+        fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+            keys.forEach(::removeAdditionalProperty)
         }
 
         fun build(): InstrumentCreateResponse =
