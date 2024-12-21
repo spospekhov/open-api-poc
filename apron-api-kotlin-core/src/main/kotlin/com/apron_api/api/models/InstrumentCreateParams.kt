@@ -9,13 +9,13 @@ import com.apron_api.api.core.JsonValue
 import com.apron_api.api.core.NoAutoDetect
 import com.apron_api.api.core.http.Headers
 import com.apron_api.api.core.http.QueryParams
+import com.apron_api.api.core.immutableEmptyMap
 import com.apron_api.api.core.toImmutable
 import com.apron_api.api.errors.ApronApiInvalidDataException
 import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
 import com.fasterxml.jackson.annotation.JsonCreator
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.util.Objects
 
 class InstrumentCreateParams
@@ -61,16 +61,17 @@ constructor(
 
     internal fun getQueryParams(): QueryParams = additionalQueryParams
 
-    @JsonDeserialize(builder = InstrumentCreateBody.Builder::class)
     @NoAutoDetect
     class InstrumentCreateBody
+    @JsonCreator
     internal constructor(
-        private val token: String?,
-        private val accountId: String?,
-        private val companyId: String?,
-        private val name: String?,
-        private val type: Type?,
-        private val additionalProperties: Map<String, JsonValue>,
+        @JsonProperty("token") private val token: String?,
+        @JsonProperty("accountId") private val accountId: String?,
+        @JsonProperty("companyId") private val companyId: String?,
+        @JsonProperty("name") private val name: String?,
+        @JsonProperty("type") private val type: Type?,
+        @JsonAnySetter
+        private val additionalProperties: Map<String, JsonValue> = immutableEmptyMap(),
     ) {
 
         @JsonProperty("token") fun token(): String? = token
@@ -104,38 +105,41 @@ constructor(
             private var additionalProperties: MutableMap<String, JsonValue> = mutableMapOf()
 
             internal fun from(instrumentCreateBody: InstrumentCreateBody) = apply {
-                this.token = instrumentCreateBody.token
-                this.accountId = instrumentCreateBody.accountId
-                this.companyId = instrumentCreateBody.companyId
-                this.name = instrumentCreateBody.name
-                this.type = instrumentCreateBody.type
-                additionalProperties(instrumentCreateBody.additionalProperties)
+                token = instrumentCreateBody.token
+                accountId = instrumentCreateBody.accountId
+                companyId = instrumentCreateBody.companyId
+                name = instrumentCreateBody.name
+                type = instrumentCreateBody.type
+                additionalProperties = instrumentCreateBody.additionalProperties.toMutableMap()
             }
 
-            @JsonProperty("token") fun token(token: String) = apply { this.token = token }
+            fun token(token: String?) = apply { this.token = token }
 
-            @JsonProperty("accountId")
-            fun accountId(accountId: String) = apply { this.accountId = accountId }
+            fun accountId(accountId: String?) = apply { this.accountId = accountId }
 
-            @JsonProperty("companyId")
-            fun companyId(companyId: String) = apply { this.companyId = companyId }
+            fun companyId(companyId: String?) = apply { this.companyId = companyId }
 
-            @JsonProperty("name") fun name(name: String) = apply { this.name = name }
+            fun name(name: String?) = apply { this.name = name }
 
-            @JsonProperty("type") fun type(type: Type) = apply { this.type = type }
+            fun type(type: Type?) = apply { this.type = type }
 
             fun additionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
                 this.additionalProperties.clear()
-                this.additionalProperties.putAll(additionalProperties)
+                putAllAdditionalProperties(additionalProperties)
             }
 
-            @JsonAnySetter
             fun putAdditionalProperty(key: String, value: JsonValue) = apply {
-                this.additionalProperties.put(key, value)
+                additionalProperties.put(key, value)
             }
 
             fun putAllAdditionalProperties(additionalProperties: Map<String, JsonValue>) = apply {
                 this.additionalProperties.putAll(additionalProperties)
+            }
+
+            fun removeAdditionalProperty(key: String) = apply { additionalProperties.remove(key) }
+
+            fun removeAllAdditionalProperties(keys: Set<String>) = apply {
+                keys.forEach(::removeAdditionalProperty)
             }
 
             fun build(): InstrumentCreateBody =

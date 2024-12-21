@@ -2,19 +2,24 @@
 
 package com.apron_api.api.errors
 
+import com.apron_api.api.core.ExcludeMissing
 import com.apron_api.api.core.JsonValue
 import com.apron_api.api.core.NoAutoDetect
+import com.apron_api.api.core.immutableEmptyMap
 import com.apron_api.api.core.toImmutable
 import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.annotation.JsonCreator
 import java.util.Objects
 
-@JsonDeserialize(builder = ApronApiError.Builder::class)
 @NoAutoDetect
 class ApronApiError
+@JsonCreator
 private constructor(
-    @JsonAnyGetter val additionalProperties: Map<String, JsonValue>,
+    @JsonAnyGetter
+    @ExcludeMissing
+    @JsonAnySetter
+    val additionalProperties: Map<String, JsonValue> = immutableEmptyMap(),
 ) {
 
     fun toBuilder() = Builder().from(this)
@@ -37,7 +42,6 @@ private constructor(
             putAllAdditionalProperties(additionalProperties)
         }
 
-        @JsonAnySetter
         fun putAdditionalProperty(key: String, value: JsonValue) = apply {
             additionalProperties.put(key, value)
         }
